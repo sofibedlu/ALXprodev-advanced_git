@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Pre-commit hook to check if each directory has a README.md
+
+# List directories at top level
+dirs=$(find . -maxdepth 1 -type d ! -path . ! -path "./.git" | sed 's|^\./||')
+
+missing_readmes=()
+
+for d in $dirs
+do
+  if [ ! -f "$d/README.md" ]; then
+    missing_readmes+=("$d")
+  fi
+done
+
+if [ ${#missing_readmes[@]} -ne 0 ]; then
+  echo "Error: Missing README.md in the following directories:"
+  for d in "${missing_readmes[@]}"
+  do
+    echo "  - $d"
+  done
+  echo "Aborting commit."
+  exit 1
+fi
+
+exit 0
